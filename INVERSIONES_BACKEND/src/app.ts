@@ -2,12 +2,14 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import fondoRoutes from "./routes/fondo.route";
 import usuarioRoutes from "./routes/usuario.routes";
+//import inversionesRoutes from "./routes/inversiones.routes";
+import fondoUsuarioRoutes from "./routes/fondo-usuario.routes";
 
 const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
   }),
 );
@@ -15,6 +17,8 @@ app.use(
 app.use(express.json());
 app.use("/fondos", fondoRoutes);
 app.use("/usuarios", usuarioRoutes);
+//app.use("/inversiones", inversionesRoutes);
+app.use("/fondos-usuario", fondoUsuarioRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({
