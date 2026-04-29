@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
+import usuariosRoutes from '../src/routes/usuario.routes';
 // import cors from 'cors';
 
 
@@ -13,7 +14,7 @@ const app = express();
 
 app.use(express.json());
 
-
+app.use('/usuarios', usuariosRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({
