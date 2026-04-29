@@ -1,26 +1,24 @@
-import express, { Request, Response, NextFunction } from 'express';
-// import cors from 'cors';
-
-
+import express, { Request, Response, NextFunction } from "express";
+import cors from "cors";
+import fondoRoutes from "./routes/fondo.route";
 
 const app = express();
 
-
-// app.use(cors({
-//     origin: 'http://localhost:5173', 
-//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-// }));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  }),
+);
 
 app.use(express.json());
-
-
+app.use("/fondos", fondoRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({
-    message: 'Not found'
+    message: "Not found",
   });
 });
-
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
