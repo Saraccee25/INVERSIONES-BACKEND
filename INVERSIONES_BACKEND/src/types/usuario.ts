@@ -5,5 +5,5 @@ export interface Usuario {
   correo: string;
   cod_ref: string;
   cod_usuario_ref: string;
-  interes_ref: number;
+  interes_ref?: number;
 }
