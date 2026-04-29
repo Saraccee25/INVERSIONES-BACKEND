@@ -4,7 +4,7 @@ import { getFondosUsuarioByIdController, getFondosUsuarioController, createFondo
 const router = Router();
 
 router.get("/", getFondosUsuarioController);
-router.post("/", createFondoUsuarioController);
+router.post("/crear", createFondoUsuarioController);
 router.get("/usuario/:usuario_documento", getFondoUsuarioByDocumentoController);
 router.get("/:id", getFondosUsuarioByIdController);
 router.put("/:id", updateFondoUsuarioController);

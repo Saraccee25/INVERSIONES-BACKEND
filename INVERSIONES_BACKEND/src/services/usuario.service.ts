@@ -2,24 +2,25 @@ import type { Usuario } from "../types/usuario";
 import pool from "../config/db";
 import { SelectResult, MutationResult } from "../types/types";
 
+export const asosiarUsuarioReferidoService = async (documento: string, cod_usuario_ref: string): Promise<void> => {
+    const usuarioReferido = await getUsuarioByDocumentoService(documento);
+    if (!usuarioReferido){
+        throw new Error('Usuario referido no encontrado');
+    }
+
+    const query = 'UPDATE usuario SET cod_usuario_ref = ? WHERE documento = ?';
+    await pool.query<MutationResult>(query, [cod_usuario_ref, documento]);
+}
+
 export const getUsuariosService = async (): Promise<SelectResult> => {
     const query = 'SELECT * FROM usuario';
     const [rows] = await pool.query<SelectResult>(query);
     return rows;
 }
 
-export const createUsuarioService = async (usuario: Omit<Usuario, "cod_ref">): Promise<void> => {
-    const codeRef = usuario.documento + "_" + usuario.nombre;
-    if (!usuario.interes_ref){
-        usuario.interes_ref = 0;
-    }
-    const query = 'INSERT INTO usuario (documento, nombre, apellido, correo, cod_ref, cod_usuario_ref, interes_ref) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    const values = [usuario.documento, usuario.nombre, usuario.apellido, usuario.correo, codeRef, usuario.cod_usuario_ref, usuario.interes_ref];
-    const [result] = await pool.query<MutationResult>(query, values);
-}
-
 export const getUsuarioByDocumentoService = async (documento: string): Promise<Usuario | null> => {
     const query = 'SELECT * FROM usuario WHERE documento = ?';
+    console.log(documento, "documento en servicio");
     const [rows] = await pool.query<SelectResult>(query, [documento]);
     if (rows.length === 0) {
         return null;
@@ -34,6 +35,28 @@ export const getUsuarioByDocumentoService = async (documento: string): Promise<U
         interes_ref: rows[0].interes_ref
     }
 }
+
+export const createUsuarioService = async (usuario: Omit<Usuario, "cod_ref">): Promise<void> => {
+    const codeRef = usuario.documento + "_" + usuario.nombre;
+    if (!usuario.interes_ref){
+        usuario.interes_ref = 0;
+    }
+    if(usuario.cod_usuario_ref){
+        const documento = usuario.cod_usuario_ref.split("_")[0];
+        console.log(documento);
+        const usuarioExistente = await getUsuarioByDocumentoService(documento);
+
+        if(!usuarioExistente){
+            throw new Error('El usuario con el documento proporcionado no existe');
+        }
+         await asosiarUsuarioReferidoService(usuarioExistente.documento, usuarioExistente.cod_usuario_ref);
+    }
+    const query = 'INSERT INTO usuario (documento, nombre, apellido, correo, cod_ref, cod_usuario_ref, interes_ref) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    const values = [usuario.documento, usuario.nombre, usuario.apellido, usuario.correo, codeRef, usuario.cod_usuario_ref, usuario.interes_ref];
+    const [result] = await pool.query<MutationResult>(query, values);
+}
+
+
 
 export const updateUsuarioService = async (documento: string, usuario: Partial<Usuario>): Promise<void> => {
     const fields = [];
@@ -70,3 +93,4 @@ export const updateUsuarioService = async (documento: string, usuario: Partial<U
     values.push(documento);
     await pool.query(query, values);
 }
+
