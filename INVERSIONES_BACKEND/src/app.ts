@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import fondoRoutes from "./routes/fondo.route";
+import usuarioRoutes from "./routes/usuario.routes";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(
 
 app.use(express.json());
 app.use("/fondos", fondoRoutes);
+app.use("/usuarios", usuarioRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({
