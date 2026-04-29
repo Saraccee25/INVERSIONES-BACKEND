@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { Fondo } from "../types/fondo";
 import { getFondosService, createFondoService, getFondoByIdService, updateFondoService, deleteFondoService} from "../services/fondo.service";
-
+import { FondoSchema, FondoUpdateSchema } from "../schemas/fondos.schema";
 export const getFondosController = async (req: Request, res: Response) => {
   try {
     const fondos: Fondo[] = await getFondosService();
@@ -20,6 +20,13 @@ export const getFondosController = async (req: Request, res: Response) => {
 
 export const createFondoController = async (req: Request, res: Response) => {
   try {
+    const validation = FondoSchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({
+        message: "Datos de fondo inválidos",
+        errors: validation.error.flatten().fieldErrors,
+      });
+    }
     const { nombre, tasa_mensual, monto_min } = req.body;
     await createFondoService({ nombre, tasa_mensual, monto_min });
     return res.status(201).json({ message: "Fondo creado exitosamente" });

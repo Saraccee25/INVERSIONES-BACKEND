@@ -73,3 +73,21 @@ export const deleteFondoUsuarioService = async (id: number): Promise<void> => {
     const query = 'DELETE FROM fondo_usuario WHERE id = ?';
     await pool.query<MutationResult>(query, [id]);
 }
+
+export const getFondosUsuarioByDocumentoService = async (usuario_documento: string): Promise<FondoUsuario[]> => {
+    const query = 'SELECT * FROM fondo_usuario WHERE usuario_documento = ?';
+    const [rows] = await pool.query<SelectResult>(query, [usuario_documento]);
+    return rows as FondoUsuario[];
+}
+
+
+export const simularRendimientoFondoUsuarioService = async (id: number): Promise<void> => {
+    const fondoUsuario = await getFondoUsuarioByIdService(id);
+    if (!fondoUsuario) {
+        throw new Error('Fondo de usuario no encontrado');
+    }
+    const numMeses = fondoUsuario.num_meses + 1;
+
+    await updateFondoUsuarioService(id, { num_meses: numMeses });
+
+}

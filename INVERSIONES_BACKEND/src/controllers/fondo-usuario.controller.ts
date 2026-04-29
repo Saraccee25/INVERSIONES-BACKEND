@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import {getFondoUsuarioByIdService, getFondosUsuarioService, createFondoUsuarioService, deleteFondoUsuarioService, updateFondoUsuarioService} from "../services/fondo-usuario.service";
+import {getFondoUsuarioByIdService, getFondosUsuarioService, createFondoUsuarioService, deleteFondoUsuarioService, updateFondoUsuarioService, getFondosUsuarioByDocumentoService, simularRendimientoFondoUsuarioService} from "../services/fondo-usuario.service";
 import type { FondoUsuario } from "../types/fondo-usuario";
 
 export const getFondosUsuarioController = async (_req: Request, res: Response) => {
@@ -24,7 +24,7 @@ export const getFondosUsuarioByIdController = async (req: Request<{ id: string }
         const id = parseInt(req.params.id, 10);
         const fondoUsuario = await getFondoUsuarioByIdService(id);
         if (!fondoUsuario) {
-            return res.status(404).json({ message: "Fondo de usuario no encontrado" });
+            return res.status(404).json({ message: "Fondo de usuario no encontradoi" });
         }
         return res.status(200).json(fondoUsuario);
     } catch (error) {
@@ -89,6 +89,47 @@ export const updateFondoUsuarioController = async (req: Request<{ id: string }>,
                 error: error.message,
             });
         } else {
+            res.status(500).json({ message: "Error interno del servidor" });
+        }
+    }
+}
+
+export const getFondoUsuarioByDocumentoController = async (req: Request<{ usuario_documento: string }>, res: Response) => {
+    try {
+        console.log("Documento recibido:", req.params.usuario_documento); 
+        const { usuario_documento } = req.params;
+        const fondoUsuario = await getFondosUsuarioByDocumentoService(usuario_documento);
+        if (!fondoUsuario) {
+            return res.status(404).json({ message: "Fondo de usuario no encontradoo" });
+        }
+        return res.status(200).json(fondoUsuario);
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json({
+                message: "Error al obtener fondo de usuario",
+                error: error.message,
+            });
+        }
+        else {
+            res.status(500).json({ message: "Error interno del servidor" });
+        }
+    }
+}
+
+export const simularRendimientoFondoUsuarioController = async (req: Request<{ id: string }>, res: Response) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        await simularRendimientoFondoUsuarioService(id);
+        return res.status(200).json({ message: "Simulación de adelantamiento de meses exitosa" });
+    }
+    catch (error) {        if (error instanceof Error) {
+            res.status(500).json({
+                message: "Error al simular rendimiento del fondo de usuario",
+                error: error.message,
+            });
+        }
+        else {
             res.status(500).json({ message: "Error interno del servidor" });
         }
     }
